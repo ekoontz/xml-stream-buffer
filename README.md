@@ -7,41 +7,33 @@ bundled com.sun.org.apache.xerces.internal.impl.XMLStreamReaderImpl.
 ## Usage
 
 ```
-❯ cd data.xml
-
-data.xml on  master [!?] via ☕ v14.0.1 via ⬢ v14.9.0 on ☁️  us-west-1
-❯ git remote -v
+$ cd data.xml
+$ git remote -v
 origin	git@github.com:clojure/data.xml.git (fetch)
 origin	git@github.com:clojure/data.xml.git (push)
-
-data.xml on  master [!?] via ☕ v14.0.1 via ⬢ v14.9.0 on ☁️  us-west-1
-❯ git log -1
+$ git log -1
 commit 564bec24c4bb6dc70f7e45ba76b60bc2d35ff09d (HEAD -> master, origin/master, origin/HEAD)
 Author: Alex Miller <alex.miller@cognitect.com>
 Date:   Thu Jun 18 13:05:06 2020 -0500
 
     add LICENSE text file
 
-data.xml on  master [!?] via ☕ v14.0.1 via ⬢ v14.9.0 on ☁️  us-west-1
-❯ lein install
+$ lein install
 OpenJDK 64-Bit Server VM warning: Options -Xverify:none and -noverify were deprecated in JDK 13 and will likely be removed in a future release.
 Created /Users/ekoontz/data.xml/target/data.xml-0-UE-DEVELOPMENT.jar
 Wrote /Users/ekoontz/data.xml/pom.xml
 Installed jar and pom into local repo.
 
-data.xml on  master [!?] via ☕ v14.0.1 via ⬢ v14.9.0 on ☁️  us-west-1 took 3s
-❯ cd ../xml-stream-buffer
+$ cd ../xml-stream-buffer
 
-xml-stream-buffer on  master on ☁️  us-west-1
-❯ git log -1
+$ git log -1
 commit 409f36da54655b294fb97cdf7b23c3806f10574c (HEAD -> master)
 Author: Eugene Koontz <ekoontz@hiro-tan.org>
 Date:   Sat Aug 29 22:54:37 2020 +0200
 
     initial commit
 
-xml-stream-buffer on  master on ☁️  us-west-1
-❯ lein repl
+$ lein repl
 OpenJDK 64-Bit Server VM warning: Options -Xverify:none and -noverify were deprecated in JDK 13 and will likely be removed in a future release.
 nREPL server started on port 50306 on host 127.0.0.1 - nrepl://127.0.0.1:50306
 REPL-y 0.4.4, nREPL 0.6.0
