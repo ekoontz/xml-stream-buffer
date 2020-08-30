@@ -124,7 +124,7 @@ xml-stream-buffer.core=>
 ## The solution
 
 ```
-$ cd data.xml
+$ cd ../data.xml
 $ git remote add ekoontz git@github.com:ekoontz/data.xml.git
 $ git fetch ekoontz
 $ git checkout woodstox
