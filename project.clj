@@ -4,6 +4,7 @@
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.10.1"]
-                 [org.clojure/data.xml "0-UE-DEVELOPMENT"]]
+                 ;; see README.md: you need to build with:  https://github.com/ekoontz/data.xml
+                 [org.clojure/data.xml "0-UE-DEVELOPMENT"]
+                 [com.fasterxml.woodstox/woodstox-core "6.2.1"]]
   :repl-options {:init-ns xml-stream-buffer.core})
-

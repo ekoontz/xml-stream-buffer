@@ -1,10 +1,12 @@
 # xml-stream-buffer
 
-Shows the 8192-character limit problem when parsing XML documents with the JDK's 
-bundled com.sun.org.apache.xerces.internal.impl.XMLStreamReaderImpl.
+Shows the fixed length 8192-character limit problem when parsing XML documents
+using [data.xml](https://github.com/clojure/data.xml) with the JDK's bundled
+com.sun.org.apache.xerces.internal.impl.XMLStreamReaderImpl, and then
+how I solved it by building data.xml with [woodstox](https://github.com/FasterXML/woodstox).
 
 
-## Usage
+## The Problem
 
 ```
 $ cd data.xml
@@ -25,14 +27,6 @@ Wrote /Users/ekoontz/data.xml/pom.xml
 Installed jar and pom into local repo.
 
 $ cd ../xml-stream-buffer
-
-$ git log -1
-commit 409f36da54655b294fb97cdf7b23c3806f10574c (HEAD -> master)
-Author: Eugene Koontz <ekoontz@hiro-tan.org>
-Date:   Sat Aug 29 22:54:37 2020 +0200
-
-    initial commit
-
 $ lein repl
 OpenJDK 64-Bit Server VM warning: Options -Xverify:none and -noverify were deprecated in JDK 13 and will likely be removed in a future release.
 nREPL server started on port 50306 on host 127.0.0.1 - nrepl://127.0.0.1:50306
@@ -48,13 +42,11 @@ OpenJDK 64-Bit Server VM 14.0.1+7
 
 xml-stream-buffer.core=> (load "core")
 nil
-xml-stream-buffer.core=> (parsable)
+xml-stream-buffer.core=> (small)
 #xml/element{:tag :a}
 xml-stream-buffer.core=> (too-big)
-Error printing return value (XMLStreamException) at com.sun.org.apache.xerces.internal.impl.XMLStreamReaderImpl/next (XMLStreamReaderImpl.java:647).
-ParseError at [row,col]:[2,8192]
-Message: Stream Closed
-
+Error printing return value (IOException) at java.io.FileInputStream/readBytes (FileInputStream.java:-2).
+Stream Closed
 xml-stream-buffer.core=> *e
 #error {
  :cause "ParseError at [row,col]:[2,8192]\nMessage: Stream Closed"
@@ -126,4 +118,70 @@ xml-stream-buffer.core=> *e
   [clojure.lang.AFn run "AFn.java" 22]
   [java.lang.Thread run "Thread.java" 832]]}
 xml-stream-buffer.core=>
+```
+
+
+## The solution
+
+```
+$ cd data.xml
+$ git remote add ekoontz git@github.com:ekoontz/data.xml.git
+$ git fetch ekoontz
+$ git checkout woodstox
+$ lein install
+$ cd ../xml-stream-buffer
+$ lein repl
+OpenJDK 64-Bit Server VM warning: Options -Xverify:none and -noverify were deprecated in JDK 13 and will likely be removed in a future release.
+...
+xml-stream-buffer.core=> (load "core")
+nil
+xml-stream-buffer.core=> (small)
+#xml/element{:tag :a}
+xml-stream-buffer.core=> (too-big)
+Error printing return value (IOException) at java.io.FileInputStream/readBytes (FileInputStream.java:-2).
+Stream Closed
+xml-stream-buffer.core=> (parseable)
+#xml/element{:tag :a}
+xml-stream-buffer.core=>
+```
+
+## The diff for `data.xml`
+
+
+```
+$ cd ../data.xml
+$ git diff master..woodstox project.clj src | cat
+diff --git a/project.clj b/project.clj
+index eb91d2b..cf6a03f 100644
+--- a/project.clj
++++ b/project.clj
+@@ -8,5 +8,6 @@
+                  [org.clojure/tools.nrepl "0.2.13"]
+                  [org.clojure/test.check "0.9.0"]
+                  [figwheel-sidecar "0.5.17"]
++                 [com.fasterxml.woodstox/woodstox-core "6.2.1"]
+                  [binaryage/devtools "0.9.10"]]
+   :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]})
+diff --git a/src/main/clojure/clojure/data/xml/jvm/parse.clj b/src/main/clojure/clojure/data/xml/jvm/parse.clj
+index 8b631bc..aa06c0e 100644
+--- a/src/main/clojure/clojure/data/xml/jvm/parse.clj
++++ b/src/main/clojure/clojure/data/xml/jvm/parse.clj
+@@ -20,6 +20,7 @@
+    (java.io InputStream Reader)
+    (javax.xml.stream
+     XMLInputFactory XMLStreamReader XMLStreamConstants)
++   (com.ctc.wstx.api WstxInputProperties)
+    (clojure.data.xml.event EndElementEvent)))
+
+ (def ^{:private true} input-factory-props
+@@ -31,7 +32,8 @@
+    :validating XMLInputFactory/IS_VALIDATING
+    :reporter XMLInputFactory/REPORTER
+    :resolver XMLInputFactory/RESOLVER
+-   :support-dtd XMLInputFactory/SUPPORT_DTD})
++   :support-dtd XMLInputFactory/SUPPORT_DTD
++   :input-buffer-length WstxInputProperties/P_INPUT_BUFFER_LENGTH})
+
+ (defn- attr-prefix [^XMLStreamReader sreader index]
+   (let [p (.getAttributePrefix sreader index)]
 ```
